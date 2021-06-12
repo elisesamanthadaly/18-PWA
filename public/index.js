@@ -152,7 +152,7 @@ document.querySelector("#sub-btn").onclick = function() {
   sendTransaction(false);
 };
 
-// created indexedDB
+// create indexedDB
 const request = indexedDB.open("budget", 1);
 
 request.onupgradeneeded = function(event) {
@@ -166,6 +166,9 @@ request.onsuccess = function(event) {
     checkDatabase();
   }
 };
+
+// going back online, add indexedDB values to mongoDB
+window.addEventListener("online", checkDatabase);
 
 function checkDatabase() {
   const transaction = db.transaction(["transaction"], "readwrite");
@@ -192,10 +195,9 @@ function checkDatabase() {
   };
 }
 
+// save record when offline
 function saveRecord(record) {
   const transaction = db.transaction(["transaction"], "readwrite");
   const store = transaction.objectStore("transaction");
   store.add(record);
 }
-
-window.addEventListener("online", checkDatabase);
