@@ -1,23 +1,45 @@
 const FILES_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/index.js',
-  '/styles.css',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  "/",
+  "/index.html",
+  "/index.js",
+  "/styles.css",
+  "/icons/icon-192x192.png",
+  "/icons/icon-512x512.png",
+  "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
+  "https://cdn.jsdelivr.net/npm/chart.js@2.8.0"
 ];
+// need to cache bootstrap and script
 
-const CACHE_NAME = 'static-cache-v2';
+const CACHE_NAME = "static-cache-v2";
+const DATA_CACHE_NAME = "data-cache-v1";
 
 // install
-self.addEventListener('install', event => {
-  console.log('Attempting to install service worker and cache static assets');
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-    .then(cache => {
+self.addEventListener("install", function(evt) {
+  evt.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      console.log("Your files were pre-cached successfully!");
       return cache.addAll(FILES_TO_CACHE);
     })
   );
+
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", function(evt) {
+  evt.waitUntil(
+    caches.keys().then(keyList => {
+      return Promise.all(
+        keyList.map(key => {
+          if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
+            console.log("Removing old cache data", key);
+            return caches.delete(key);
+          }
+        })
+      );
+    })
+  );
+
+  self.clients.claim();
 });
 
 // fetch
@@ -25,7 +47,7 @@ self.addEventListener("fetch", function(evt) {
   // cache successful requests to the API
   if (evt.request.url.includes("/api/")) {
     evt.respondWith(
-      caches.open(CACHE_NAME).then(cache => {
+      caches.open(DATA_CACHE_NAME).then(cache => {
         return fetch(evt.request)
           .then(response => {
             // If the response was good, clone it and store it in the cache.
@@ -47,27 +69,10 @@ self.addEventListener("fetch", function(evt) {
 
   // if the request is not for the API, serve static assets using "offline-first" approach.
   // see https://developers.google.com/web/fundamentals/instant-and-offline/offline-cookbook#cache-falling-back-to-network
-  // evt.respondWith(
-  //   caches.match(evt.request).then(function(response) {
-  //     return response || fetch(evt.request);
-  //   })
-  // );
   evt.respondWith(
-    caches.match(evt.request)
-    .then(response => {
-      if (response) {
-        console.log('Found ', evt.request.url, ' in cache');
-        return response;
-      }
-      console.log('Network request for ', evt.request.url);
-      return fetch(evt.request)
-
-      // TODO 4 - Add fetched files to the cache
-
-    }).catch(error => {
-
-      // TODO 6 - Respond with custom offline page
-
+    caches.match(evt.request).then(function(response) {
+      return response || fetch(evt.request);
     })
   );
 });
+
