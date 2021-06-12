@@ -8,7 +8,6 @@ const FILES_TO_CACHE = [
   "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
   "https://cdn.jsdelivr.net/npm/chart.js@2.8.0"
 ];
-// need to cache bootstrap and script
 
 const CACHE_NAME = "static-cache-v2";
 const DATA_CACHE_NAME = "data-cache-v1";
@@ -68,7 +67,6 @@ self.addEventListener("fetch", function(evt) {
   }
 
   // if the request is not for the API, serve static assets using "offline-first" approach.
-  // see https://developers.google.com/web/fundamentals/instant-and-offline/offline-cookbook#cache-falling-back-to-network
   evt.respondWith(
     caches.match(evt.request).then(function(response) {
       return response || fetch(evt.request);
