@@ -1,7 +1,7 @@
 # Unit-18-PWA-Homework
 # Online/Offline Budget Trackers
 
-This applications allows users to manage their budget by entering deposits and expenses. The application can be used both online and offline.
+This application allows users to manage their budget by entering deposits and expenses. The application can be used both online and offline.
 
 The deployed application can be found [here](https://esd-budget-18.herokuapp.com/). The application's GitHub repository can be found [here](https://github.com/elisesamanthadaly/Unit-18-PWA-Homework).
 
